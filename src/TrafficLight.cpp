@@ -4,7 +4,6 @@
 
 /* Implementation of class "MessageQueue" */
 
-/* 
 template <typename T>
 T MessageQueue<T>::receive()
 {
@@ -18,8 +17,11 @@ void MessageQueue<T>::send(T &&msg)
 {
     // FP.4a : The method send should use the mechanisms std::lock_guard<std::mutex> 
     // as well as _condition.notify_one() to add a new message to the queue and afterwards send a notification.
+    std::lock_guard<std::mutex> uLock(_mutex); 
+    std::cout << "Sending current phase. Not yet to be received" << std::endl; 
+    this->_queue.push_back(std::move(msg)); 
+    this->_cond.notify_one(); 
 }
-*/
 
 /* Implementation of class "TrafficLight" */
 
@@ -60,7 +62,6 @@ void TrafficLight::cycleThroughPhases() {
   // wait 1ms between two cycles.
   
   // Similar to Vehicle::drive() method
-
   long cycleDuration; 
   TrafficLightPhase lightPhase = this->getCurrentPhase();  
   std::chrono::time_point<std::chrono::system_clock> lastUpdate; 
@@ -68,7 +69,7 @@ void TrafficLight::cycleThroughPhases() {
 
   std::random_device rd;
   std::mt19937 eng(rd());
-  std::uniform_int_distribution<> distr(4000, 7000);
+  std::uniform_int_distribution<> distr(4000, 6000);
   cycleDuration = distr(eng); 
   
   std::cout << "Cycle duration Traffic Light: " << cycleDuration << std::endl; 
@@ -77,8 +78,7 @@ void TrafficLight::cycleThroughPhases() {
     // sleep at every iteration to reduce CPU usage
     std::this_thread::sleep_for(std::chrono::milliseconds(1));
     long timeSinceLastUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastUpdate).count();
-    // std::cout << "Time since last update: " << timeSinceLastUpdate << std::endl; 
-    // std::cout << "Cycle duration: " << cycleDuration << std::endl; 
+
     if (timeSinceLastUpdate >= cycleDuration ){
       lightPhase = (TrafficLightPhase::red == this->getCurrentPhase())
                        ? TrafficLightPhase::green
@@ -94,6 +94,11 @@ void TrafficLight::cycleThroughPhases() {
       // Get new random cycleDuration time and lastUpdate time for new phase change
       cycleDuration = distr(eng);
       lastUpdate = std::chrono::system_clock::now();
+
+      // Leave placeholder for now for message queue
+      // MessageQueue
+      this->_message.send(this->getCurrentPhase()); 
+
     }
   }
 }
