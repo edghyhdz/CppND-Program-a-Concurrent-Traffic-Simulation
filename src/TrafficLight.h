@@ -40,10 +40,10 @@ class TrafficLight : public TrafficObject {
 public:
   // constructor / desctructor
   TrafficLight();
-  ~TrafficLight();
+//   ~TrafficLight();
 
   // getters / setters
-  TrafficLightPhase getCurrentPhase() { return _currentPhase; };
+  TrafficLightPhase getCurrentPhase();
 
   // typical behaviour methods
   void waitForGreen();
