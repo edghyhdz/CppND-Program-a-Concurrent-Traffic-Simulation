@@ -11,7 +11,7 @@ T MessageQueue<T>::receive()
     // to wait for and receive new messages and pull them from the queue using move semantics. 
     // The received object should then be returned by the receive function. 
     std::unique_lock<std::mutex> uLock(_mutex); 
-    _cond.wait(uLock, [this] { return !_queue.empty(); }) 
+    _cond.wait(uLock, [this] { return !_queue.empty(); }); 
 
     T msg = std::move(_queue.back()); 
     _queue.pop_back(); 
@@ -35,7 +35,6 @@ void MessageQueue<T>::send(T &&msg)
 /* Implementation of class "TrafficLight" */
 
 TrafficLight::TrafficLight() { 
-    std::cout << "INITIALIZED TRAFFIC LIGHT" << std::endl; 
     _currentPhase = TrafficLightPhase::red; }
 
 void TrafficLight::waitForGreen()
